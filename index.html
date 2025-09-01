@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Uchronie des véhicules • Starter 1925–1949</title>
+  <title>Uchronie des véhicules • Starter 1925–2125</title>
   <style>
     :root {
       --bg: #0b1020;
@@ -69,6 +69,7 @@
       .controls .left{ justify-content:space-between; }
     }
   </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-dark">
   <header>
@@ -87,6 +88,32 @@
     </div>
   </header>
 
+  <section class="chronodius-hero" id="hero">
+  <div class="wrap hero-wrap">
+    <h2 class="hero-title">CHRONODIUS</h2>
+    <p class="hero-sub">Voyageons autour de l’année 2025</p>
+
+    <a class="hero-cta" href="#cards" aria-label="Aller à la galerie">
+      Découvrir
+    </a>
+
+    <div class="hero-sketches">
+      <!-- Vue 3/4 avant (en haut sur desktop ; en premier sur mobile) -->
+      <figure class="hero-sheet">
+        <img src="img/chronodius-sketch.png"
+             alt="Croquis 3/4 avant d’une supercar futuriste, bleu électrique métallisé, accents argent, pneus esquissés, hachures">
+      </figure>
+
+      <!-- Vue de face (en dessous sur desktop et mobile) -->
+      <figure class="hero-sheet">
+        <img src="img/chronodius-front.png"
+             alt="Croquis face avant, phares horizontaux futuristes et calandre de véhicule électrique">
+      </figure>
+    </div>
+  </div>
+</section>
+
+
   <main class="wrap">
     <div class="controls">
       <div class="left">
@@ -103,9 +130,17 @@
 
   <script>
     // ---------- Config ----------
-    const ERAS = [1925, 1950, 1975, 2000, 2025, 2050, 2075, 2100, 2125]; // 9 boutons listés
+    const ERAS = [1925, 1950, 1975, 2000, 2025, 2050, 2075, 2100, 2125];
     const ERA_SPAN_YEARS = 25;    // chaque époque couvre 25 ans (ex. 1925–1949)
     const PAGE_SIZE = 5;          // 5 véhicules par page
+
+    // Années pour lesquelles tu as déjà de vraies images dans /img (PNG)
+    const AVAILABLE_IMG_YEARS = new Set([
+      1925, 1926,
+      1930, 1931, 1932, 1934, 1935, 1936, 1937,
+      1940, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949,
+      1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959
+    ]);
 
     // ---------- Éléments ----------
     const eraBar = document.getElementById('eraBar');
@@ -128,189 +163,28 @@
     applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
     themeButtons.forEach(btn=>btn.addEventListener('click',()=>applyTheme(btn.dataset.theme)));
 
-    // ---------- Fonction utilitaire pour les images ----------
-    function getVehicleImage(year) {
-      // Utiliser les vraies images pour les années spécifiées, placeholders pour les autres
-      if (year === 1925 || year === 1926 || 
-          year === 1930 || year === 1931 || year === 1932 || year === 1934 ||
-          year === 1935 || year === 1936 || year === 1937 ||
-          year === 1940 || year === 1941 || year === 1942 || year === 1943 || year === 1944 ||
-          year === 1945 || year === 1946 || year === 1947 || year === 1948 || year === 1949 ||
-          year === 1950 || year === 1951 || year === 1952 || year === 1953 || year === 1954 ||
-          year === 1955 || year === 1956 || year === 1957 || year === 1958 || year === 1959        
-        ) {
-        return `img/${year}.png`;
-      } else {
-        return `https://via.placeholder.com/800x520?text=${encodeURIComponent('Véhicule '+year)}`;
-      }
+    // ---------- Utilitaires images ----------
+    const PLACEHOLDER = (year)=>`https://via.placeholder.com/800x520?text=${encodeURIComponent('Véhicule '+year)}`;
+    function getVehicleImage(year){
+      return AVAILABLE_IMG_YEARS.has(year) ? `img/${year}.png` : PLACEHOLDER(year);
     }
 
-    // ---------- Données (prototype pour l'époque 1925) ----------
+    // ---------- Fabrique de données générique ----------
     function makeVehiclesForEra(startYear){
-      // couvre startYear .. startYear+24 (incl.)
       const out = [];
       for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
         const milestone = (y % 5 === 0); // années .0 ou .5
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
+        const title = milestone ? `Modèle phare ${y}` : `Transition ${y}`;
         const blurb = milestone
           ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
           : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
+        out.push({ id:`car-${y}`, year:y, title, img:getVehicleImage(y), desc:blurb });
       }
       return out;
     }
 
-    // ---------- Données pour l'époque 1950 ----------
-    function makeVehiclesForEra1950(startYear){
-      // couvre startYear .. startYear+24 (incl.)
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0); // années .0 ou .5
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 1975 ----------
-    function makeVehiclesForEra1975(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 2000 ----------
-    function makeVehiclesForEra2000(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 2025 ----------
-    function makeVehiclesForEra2025(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 2050 ----------
-    function makeVehiclesForEra2050(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 2075 ----------
-    function makeVehiclesForEra2075(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 2100 ----------
-    function makeVehiclesForEra2100(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    // ---------- Données pour l'époque 2125 ----------
-    function makeVehiclesForEra2125(startYear){
-      const out = [];
-      for(let y=startYear; y<startYear+ERA_SPAN_YEARS; y++){
-        const milestone = (y % 5 === 0);
-        const title = milestone
-          ? `Modèle phare ${y}`
-          : `Transition ${y}`;
-        const imgUrl = getVehicleImage(y);
-        const blurb = milestone
-          ? `Véhicule "phare" de l'année ${y}. Conçu pour franchir désert et plan d'eau sans arrêt. Mécanique simplifiée, plaques amphibies déployables, refroidissement par air.`
-          : `Version de transition ${y}, héritant de ${y-1} et préfigurant ${y+1}. Ailerons sur charnières, admission protégée, réglage de flotteurs évolutif.`;
-        out.push({ id: `car-${y}`, year:y, title, img:imgUrl, desc: blurb });
-      }
-      return out;
-    }
-
-    const DATA = {
-      1925: makeVehiclesForEra(1925),
-      1950: makeVehiclesForEra1950(1950),
-      1975: makeVehiclesForEra1975(1975),
-      2000: makeVehiclesForEra2000(2000),
-      2025: makeVehiclesForEra2025(2025),
-      2050: makeVehiclesForEra2050(2050),
-      2075: makeVehiclesForEra2075(2075),
-      2100: makeVehiclesForEra2100(2100),
-      2125: makeVehiclesForEra2125(2125),
-    };
+    // Génère les données pour toutes les époques
+    const DATA = Object.fromEntries(ERAS.map(era => [era, makeVehiclesForEra(era)]));
 
     // ---------- UI : barre d'époques ----------
     function buildEraBar(currentEra){
@@ -320,12 +194,7 @@
         b.textContent = era;
         b.role = 'tab';
         b.setAttribute('aria-current', era===currentEra ? 'true' : 'false');
-        if(!(era in DATA)){
-          b.disabled = true; // pas encore prêt
-          b.title = 'Bientôt';
-        }else{
-          b.addEventListener('click', ()=> navigate(era, 1));
-        }
+        b.addEventListener('click', ()=> navigate(era, 1));
         eraBar.appendChild(b);
       });
     }
@@ -361,13 +230,21 @@
       pageItems.forEach(v => {
         const art = document.createElement('article');
         art.className = 'card';
-        art.innerHTML = `
-          <img src="${v.img}" alt="Véhicule de ${v.year}" loading="lazy" />
-          <div>
-            <h3><span class="year">${v.year}</span> · ${v.title}</h3>
-            <p class="desc">${v.desc}</p>
-          </div>
+        const img = document.createElement('img');
+        img.setAttribute('alt', `Véhicule de ${v.year}`);
+        img.setAttribute('loading', 'lazy');
+        img.setAttribute('decoding', 'async');
+        img.setAttribute('width', '800');
+        img.setAttribute('height', '520');
+        img.src = v.img;
+        img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER(v.year); };
+
+        const box = document.createElement('div');
+        box.innerHTML = `
+          <h3><span class="year">${v.year}</span> · ${v.title}</h3>
+          <p class="desc">${v.desc}</p>
         `;
+        art.append(img, box);
         cards.appendChild(art);
       });
     }
